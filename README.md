@@ -4,7 +4,10 @@
   * Date: 2021-03-23
   * Author: George Peter Banyard, <girgias@php.net>
   * Status: Draft
+  * Target Version: PHP 8.1
+  * Implementation: https://github.com/php/php-src/pull/6799
   * First Published at: http://wiki.php.net/rfc/pure-intersection-types
+  * GitHub mirror: https://github.com/Girgias/intersection-types
 
 ## Introduction
 
@@ -65,11 +68,11 @@ this is because it is impossible for a value to be 2 different standard types at
 
 To catch some simple bugs in intersection type declarations, redundant types that can be detected without performing class loading will result in a compile-time error. This includes:
 
-  * Each name-resolved type may only occur once. Types like ''A&B&A'' result in an error.
+  * Each name-resolved type may only occur once. Types like `A&B&A` result in an error.
 
 This does not guarantee that the type is "minimal", because doing so would require loading all used class types.
 
-For example, if ''A'' and ''B'' are class aliases, then ''A&B'' remains a legal intersection type, even though it could be reduced to either ''A'' or ''B''. Similarly, if ''class B extends A {}'', then ''A&B'' is also a legal union type, even though it could be reduced to just ''B''.
+For example, if `A` and `B` are runtime class aliases, then `A&B` remains a legal intersection type, even though it could be reduced to either `A` or `B`. Similarly, if `class B extends A {}`, then `A&B` is also a legal union type, even though it could be reduced to just `B`.
 
 ```php
 function foo(): A&A {} // Disallowed
@@ -145,7 +148,7 @@ Formally, we arrive at this result as follows: First, the parent type `A&B` is a
 
 It is legal to add intersection types in return position and remove intersection types in parameter position:
 
-<code php>
+```php
 class A {}
 interface X {}
 
@@ -164,7 +167,7 @@ class Test2 extends Test {
     public function return1(): A {}         // FORBIDDEN: Removing return type constraint
     public function return2(): A&X {}       // Allowed: Adding extra return type constraint
 }
-</code>
+```
 
 #### Variance of individual intersection members
 
@@ -253,7 +256,7 @@ class ReflectionIntersectionType extends ReflectionType {
 }
 ```
 
-The `getTypes()` method returns an array of `ReflectionType`s that are part of the union. The types may be returned in an arbitrary order that does not match the original type declaration. The types may also be subject to equivalence transformations.
+The `getTypes()` method returns an array of `ReflectionType`s that are part of the intersection. The types may be returned in an arbitrary order that does not match the original type declaration. The types may also be subject to equivalence transformations.
 
 For example, the type `X&Y` may return types in the order `["Y", "X"]` instead.
 The only requirement on the Reflection API is that the ultimately represented type is equivalent.
@@ -265,26 +268,29 @@ The ''%%__toString()%%'' method returns a string representation of the type that
 ```php
 // This is one possible output, getTypes() and __toString() could
 // also provide the types in the reverse order instead.
-function test(): float|int {}
+function test(): A&B {}
 $rt = (new ReflectionFunction('test'))->getReturnType();
-var_dump(get_class($rt));    // "ReflectionUnionType"
+var_dump(get_class($rt));    // "ReflectionIntersectionType"
 var_dump($rt->allowsNull()); // false
-var_dump($rt->getTypes());   // [ReflectionType("int"), ReflectionType("float")]
-var_dump((string) $rt);      // "int|float"
+var_dump($rt->getTypes());   // [ReflectionType("A"), ReflectionType("B")]
+var_dump((string) $rt);      // "A&B"
 
-function test2(): float|int|null {}
+function test2(): A&B&C {}
 $rt = (new ReflectionFunction('test2'))->getReturnType();
-var_dump(get_class($rt));    // "ReflectionUnionType"
-var_dump($rt->allowsNull()); // true
-var_dump($rt->getTypes());   // [ReflectionType("int"), ReflectionType("float"),
-                             //  ReflectionType("null")]
-var_dump((string) $rt); // "int|float|null"
+var_dump(get_class($rt));    // "ReflectionIntersectionType"
+var_dump($rt->allowsNull()); // false
+var_dump($rt->getTypes());   // [ReflectionType("A"), ReflectionType("B"),
+                             //  ReflectionType("C")]
+var_dump((string) $rt); // "A&B&C"
 ```
 
 
 ## Backward Incompatible Changes
 
-This RFC does not contain any backwards incompatible changes. However, existing ReflectionType based code will have to be adjusted in order to support processing of code that uses union types. 
+This RFC does not contain any backwards incompatible changes.
+
+TBD Is this true?
+> However, existing ReflectionType based code will have to be adjusted in order to support processing of code that uses union types.
 
 ## Proposed PHP Version
 
@@ -311,7 +317,7 @@ use Traversable&Countable as CountableIterator;
 function foo(CountableIterator $x) {}
 ```
 
-In this case number is a symbol that is only visible locally and will be resolved to the original `Traversable&Countable` type during compilation.
+In this case `CountableIterator` is a symbol that is only visible locally and will be resolved to the original `Traversable&Countable` type during compilation.
 
 The second possibility is an exported typedef:
 
