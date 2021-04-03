@@ -72,7 +72,7 @@ To catch some simple bugs in intersection type declarations, redundant types tha
 
 This does not guarantee that the type is "minimal", because doing so would require loading all used class types.
 
-For example, if `A` and `B` are runtime class aliases, then `A&B` remains a legal intersection type, even though it could be reduced to either `A` or `B`. Similarly, if `class B extends A {}`, then `A&B` is also a legal union type, even though it could be reduced to just `B`.
+For example, if `A` and `B` are runtime class aliases, then `A&B` remains a legal intersection type, even though it could be reduced to either `A` or `B`. Similarly, if `class B extends A {}`, then `A&B` is also a legal intersection type, even though it could be reduced to just `B`.
 
 ```php
 function foo(): A&A {} // Disallowed
@@ -237,8 +237,6 @@ $r = new B;
 
 ### Reflection
 
-SECTION & IMPLEMENTATION TBD
-
 To support intersection types, a new class `ReflectionIntersectionType` is added:
 
 ```php
@@ -261,7 +259,7 @@ The `getTypes()` method returns an array of `ReflectionType`s that are part of t
 For example, the type `X&Y` may return types in the order `["Y", "X"]` instead.
 The only requirement on the Reflection API is that the ultimately represented type is equivalent.
 
-The ''%%__toString()%%'' method returns a string representation of the type that constitutes a valid code representation of the type in a non-namespaced context. It is not necessarily the same as what was used in the original code.
+The `__toString()` method returns a string representation of the type that constitutes a valid code representation of the type in a non-namespaced context. It is not necessarily the same as what was used in the original code.
 
 ### Examples
 
@@ -289,8 +287,7 @@ var_dump((string) $rt); // "A&B&C"
 
 This RFC does not contain any backwards incompatible changes.
 
-TBD Is this true?
-> However, existing ReflectionType based code will have to be adjusted in order to support processing of code that uses union types.
+However, existing `ReflectionType` based code might need to be adjusted in order to support processing of code that uses intersection types.
 
 ## Proposed PHP Version
 
@@ -300,7 +297,7 @@ Next minor version, i.e. PHP 8.1.
 
 The features discussed in the following are **not** part of this proposal.
 
-### Mixing union and intersection types
+### Composite types (i.e. mixing union and intersection types)
 
 While early prototyping [2] shows that supporting `A&B|C` without any grouping looks feasible,
 there are still many other considerations (e.g. Reflection), but namely the variance rules and checks,
@@ -356,4 +353,4 @@ To Ilija Tovilo for resolving the parser conflict with by-ref parameters.
 ## References
 
 [1]: Slide 14 of Nikita Popov's talk "Typed Properties and more: What's coming in PHP 7.4?" <https://image.slidesharecdn.com/presentationnikita-190519190251/95/typed-properties-and-more-whats-coming-in-php-74-14-638.jpg?cb=1558292620>  
-[2]: Git branch with basic prototype for mixing intersection and union types <https://github.com/Girgias/php-src/tree/type-intersection-with-union>  
+[2]: Git PR with basic prototype for mixing intersection and union types <https://github.com/Girgias/php-src/pull/8>  
