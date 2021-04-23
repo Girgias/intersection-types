@@ -198,6 +198,47 @@ class Test2 extends Test {
 
 Of course, the same can also be done with multiple intersection members at a time, and be combined with the addition/removal of types mentioned previously.
 
+#### Variance of intersection type to concrete class type
+
+As the primary use of intersection types is to ensure multiple interfaces are implemented,
+a concrete class or interface which implements all the interfaces present in the intersection
+is considered a subtype and thus can be used where co-variance is allowed.
+
+```php
+interface X {}
+interface Y {}
+
+class TestOne implements X, Y {}
+
+interface A
+{
+    public function foo(): X&Y;
+}
+
+
+interface B extends A
+{
+    public function foo(): TestOne;
+}
+```
+
+Moreover, it is possible to use a union type of concrete classes/interface when each of the
+member of the union implement all of the interfaces in the intersection.
+
+
+```php
+class TestTwo implements X, Y {}
+
+interface C extends A
+{
+    public function foo(X&Y $param): TestOne|TestTwo;
+}
+```
+
+The reason why this is possible is that a union of concrete classes/interfaces is less
+general then the set of possible classes which satisfy the intersection type.
+
+
 ### Coercive typing mode
 
 As standard types are not allowed in pure intersection types,
