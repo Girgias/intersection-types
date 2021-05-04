@@ -343,6 +343,9 @@ The features discussed in the following are **not** part of this proposal.
 While early prototyping [2] shows that supporting `A&B|C` without any grouping looks feasible,
 there are still many other considerations (e.g. Reflection), but namely the variance rules and checks,
 which would be dramatically increased and prone to error.
+
+There is also the opinion that composite types should not rely on precedence of unions but be explicitly grouped together.
+
 As such we consider a stepped approach by only allowing pure intersection first the best way forward.
 
 ### Type Aliases
@@ -366,6 +369,8 @@ type CountableIterator = Traversable&Countable;
 // Usable as \Foo\CountableIterator from elsewhere
 ```
 
+It should be noted that inclusion of this proposal will add extra considerations for type aliases as it would be possible to
+write composite types as if grouping was supported. However, the groundwork for supporting this is present in this proposal.
 
 ## Proposed Voting Choices
 
