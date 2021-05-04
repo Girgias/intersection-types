@@ -118,7 +118,7 @@ Intersection types follow the existing variance rules:
 
 The only change is in how intersection types interact with subtyping, with one additional rule:
 
-  * An intersection `I_1&...&I_n` is a subtype of `J_1&...&J_m` if for each `J_k` there does not exists a `I_l` such that `I_l` is a supertype of `J_k`.
+  * An intersection `I_1&...&I_n` is a subtype of `J_1&...&J_m` if for all `J_k`, `I_l` is not a supertype of `J_k`
 
 In the following, some examples of what is allowed and what isn't are given.
 
