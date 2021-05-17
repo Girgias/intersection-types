@@ -110,7 +110,7 @@ intersection_type:
 
 ### Variance
 
-Intersection types follow the existing variance rules:
+Intersection types follow standard PHP variance rules that are already used for inheritance and type checking:
 
   * Return types are covariant (child must be subtype).
   * Parameter types are contravariant (child must be supertype).
