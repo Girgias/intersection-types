@@ -61,8 +61,20 @@ this is left as a future scope.
 
 ### Supported types
 
-Only class types (interfaces and class names) are supported by intersection types,
-this is because it is impossible for a value to be 2 different standard types at the same time.
+Only class types (interfaces and class names) are supported by intersection types.
+
+The rationale is that for nearly all standard types using them in an intersection type result
+in a type which can never be satisfied (e.g. `int&string`).
+
+Usage of `mixed` in an intersection type is redundant as `mixed&T` corresponds to `T`, as such this is disallowed.
+
+Similarly using `iterable` in an intersection results in a redundant invalid type, this can be seen by expanding
+the type expression `iterable&T = (array|Traversable)&T = (array&T) | (Traversable&T) =  Traversable&T`
+
+Although an intersection with `callable` *can* make sense (e.g. string&callable),
+we think it is unwise and points to a bug.
+
+Using `self`, `static`, or `parent` is also forbidden in an intersection type as these correspond to concrete classes.
 
 #### Duplicate and redundant types
 
