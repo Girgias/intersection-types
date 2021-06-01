@@ -116,9 +116,10 @@ Intersection types follow standard PHP variance rules that are already used for 
   * Parameter types are contravariant (child must be supertype).
   * Property types are invariant (child must be subtype and supertype).
 
-The only change is in how intersection types interact with subtyping, with one additional rule:
+The only change is in how intersection types interact with subtyping, with two additional rules:
 
-  * An intersection `I_1&...&I_n` is a subtype of `J_1&...&J_m` if for all `J_k`, `I_l` is not a supertype of `J_k`
+  * `A` is a subtype of `B_1&...&B_n` if for all `B_i`, `A` is a subtype of `B_i`
+  * `A_1&...&A_n` is a subtype of `B` if there exists an `A_i` such that `A_i` is a subtype of `B`
 
 In the following, some examples of what is allowed and what isn't are given.
 
