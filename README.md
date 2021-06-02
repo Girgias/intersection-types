@@ -38,6 +38,43 @@ Supporting intersection types in the language allows us to move more type inform
   * Types are available through Reflection.
   * The syntax is a lot less boilerplate-y than phpdoc.
 
+### Motivation
+
+It is possible to emulate intersection types by creating a new interface which inherits from multiple ones,
+one such case is the built in `SeekableIterator` which extends the `Iterator` interface by adding a `seek()`
+method on it. However, an iterator can also be countable, an if a function needs to type against such a requirement
+the only possible way is to currently create a new interface:
+```php
+interface CountableIterator extends Iterator, Countable {}
+```
+
+This works, but what if we want an iterator that is countable *and* seekable?
+We need to create another interface:
+```php
+interface SeekableCountableIterator extends CountableIterator, SeekableIterator {}
+```
+
+As such, each new requirement necessitates the creation of various new interfaces taking into account all possible combinations.
+
+Moreover, the class needs to implement the specific interface and cannot rely on just implementing the base interfaces,
+meaning the introduction of such interfaces need to be propagated to all relevant classes, something which can be error prone. 
+See this non-example:
+```php
+interface A {}
+interface B {}
+interface AB extends A, B {}
+
+class Test implements A, B {}
+
+function foo(AB $v) {
+    var_dump($v);
+}
+
+foo(new Test());
+```
+
+Intersection types solve these issues.
+
 ## Proposal
 
 Add support for pure intersection types are specified using the syntax `T1&T2&...` and can be used in all positions where types are currently accepted:
