@@ -74,7 +74,10 @@ the type expression `iterable&T = (array|Traversable)&T = (array&T) | (Traversab
 Although an intersection with `callable` *can* make sense (e.g. string&callable),
 we think it is unwise and points to a bug.
 
-Using `self`, `static`, or `parent` is also forbidden in an intersection type as these correspond to concrete classes.
+Similarly `parent`, `self`, and `static` are technically feasible and *could* be used as part of an intersection,
+but impose strange restrictions on a child class which the base class violates or the base class already satisfies
+the type requirements in which case it is redundant. Therefore those 3 types are also forbidden because they likely
+point to a design issue.
 
 #### Duplicate and redundant types
 
